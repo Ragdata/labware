@@ -1,0 +1,28 @@
+extends: relman.base.yml
+name: Labware
+description: Python modules for homelabs
+version: 0.1.0
+copyright: Copyright © 2026 Redeyed Technologies
+website: https://ragdata.github.io/labware
+repo_url: https://github.com/ragdata/labware
+license: MIT License
+license_url: https://choosealicense.com/licenses/mit/
+license_file: LICENSE
+keywords:
+    - homelab
+    - self-hosting
+    - redeyed-au
+    - ragdata
+authors:
+    - username: Ragdata
+      first_name: Darren
+      surname: Poulton
+      email: ragdata@ragdata.dev
+      location: Brisbane, Australia
+      affiliation: Redeyed Technologies
+release_notes: |
+    - Pre-Release of Labware.
+    - This is a work in progress and not yet ready for production use.
+    - The source is not yet fully tested and may contain bugs.
+    - The source is not yet fully documented and may be missing features.
+    - The source is not yet fully supported and may not work as expected.
