@@ -3,11 +3,14 @@ todo.txt
 .archive
 .backlog
 .backburn
-
+*.egg-info/
 .ssh
+build/
 
 .idea
 !.idea/icon.svg
+
+.python-version
 
 **/.env
 **/.env.*
