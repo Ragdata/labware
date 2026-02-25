@@ -10,7 +10,7 @@ Repository:		https://github.com/Ragdata/labware
 Copyright:		Copyright © 2026 Redeyed Technologies
 ====================================================================
 """
-import typer
+import logging
 
 from rich.text import Text
 from rich.theme import Theme
@@ -19,18 +19,18 @@ from rich.console import Console, ConsoleOptions, RenderableType
 
 from typing import Optional, Union
 
-from . config import *
+from .. labware import config
 
 _theme = Theme({
-    "info": STYLE_INFO,
-    "success": STYLE_SUCCESS,
-    "warning": STYLE_WARNING,
-    "error": STYLE_ERROR,
-    "tip": STYLE_TIP,
-    "important": STYLE_IMPORTANT,
-    "debug": STYLE_DEBUG,
-    "head": STYLE_HEAD,
-    "dot": STYLE_DOT
+    "info": config.get("styles", "info"),
+    "success": config.get("styles", "success"),
+    "warning": config.get("styles", "warning"),
+    "error": config.get("styles", "error"),
+    "tip": config.get("styles", "tip"),
+    "important": config.get("styles", "important"),
+    "debug": config.get("styles", "debug"),
+    "head": config.get("styles", "head"),
+    "dot": config.get("styles", "dot"),
 })
 
 console = Console(theme=_theme)
@@ -124,7 +124,8 @@ def printInfo(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_INFO} " + msg
+    symbol = config.get("symbols", "info")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="info", **kwargs)
 
 def printSuccess(msg: str, **kwargs) -> None:
@@ -135,7 +136,8 @@ def printSuccess(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_SUCCESS} " + msg
+    symbol = config.get("symbols", "success")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="success", **kwargs)
 
 def printWarning(msg: str, **kwargs) -> None:
@@ -146,7 +148,8 @@ def printWarning(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_WARNING} WARNING: " + msg
+    symbol = config.get("symbols", "warning")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="warning", **kwargs)
 
 def printError(msg: str, **kwargs) -> None:
@@ -157,7 +160,8 @@ def printError(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_ERROR} ERROR: " + msg
+    symbol = config.get("symbols", "error")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="error", **kwargs)
 
 def printTip(msg: str, **kwargs) -> None:
@@ -168,7 +172,8 @@ def printTip(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_TIP} " + msg
+    symbol = config.get("symbols", "tip")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="tip", **kwargs)
 
 def printImportant(msg: str, **kwargs) -> None:
@@ -179,7 +184,8 @@ def printImportant(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_IMPORTANT} " + msg
+    symbol = config.get("symbols", "important")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="important", **kwargs)
 
 def printDebug(msg: str, **kwargs) -> None:
@@ -190,7 +196,8 @@ def printDebug(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_DEBUG} " + msg
+    symbol = config.get("symbols", "debug")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="debug", **kwargs)
 
 def printHead(msg: str, **kwargs) -> None:
@@ -201,7 +208,8 @@ def printHead(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_HEAD} " + msg
+    symbol = config.get("symbols", "head")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="head", **kwargs)
 
 def printDot(msg: str, **kwargs) -> None:
@@ -212,7 +220,8 @@ def printDot(msg: str, **kwargs) -> None:
     	msg (str): 	The message to print.
     	**kwargs: 	Arbitrary keyword arguments.
     """
-    msg = f"{SYMBOL_DOT} " + msg
+    symbol = config.get("symbols", "dot")
+    msg = f"{symbol} " + msg
     printMessage(msg, style="dot", **kwargs)
 
 def printRed(msg: str, **kwargs) -> None:
@@ -338,7 +347,7 @@ class Outlog(object):
         """
         self._logger = logger
 
-    def logMessage(self, msg: str, level: int = logging.INFO, style: Optional[str] = None, **kwargs) -> None:
+    def logMessage(self, msg: str, level: int = config.get("logging", "level"), style: Optional[str] = None, **kwargs) -> None:
         """
         Log and print a message with an optional style.
 
@@ -350,15 +359,18 @@ class Outlog(object):
         """
         if self._logger.isEnabledFor(level):
             self._logger.log(level, msg)
+        symbol = None
         match style:
             case "debug":
-                msg = f"{SYMBOL_DEBUG} " + msg
+                symbol = config.get("symbols", "debug")
             case "info":
-                msg = f"{SYMBOL_INFO} " + msg
+                symbol = config.get("symbols", "info")
             case "warning":
-                msg = f"{SYMBOL_WARNING} WARNING: " + msg
+                symbol = config.get("symbols", "warning")
             case "error":
-                msg = f"{SYMBOL_ERROR} ERROR: " + msg
+                symbol = config.get("symbols", "error")
+        if symbol is not None:
+            msg = f"{symbol} " + msg
         printMessage(msg, style=style, **kwargs)
 
     def logDebug(self, msg: str, **kwargs) -> None:
@@ -430,5 +442,3 @@ class Outlog(object):
         	**kwargs: Arbitrary keyword arguments.
         """
         self.logMessage(msg, level=logging.FATAL, style="error", **kwargs)
-
-

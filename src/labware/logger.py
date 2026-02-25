@@ -16,7 +16,15 @@ from pathlib import Path
 from typing import TextIO, Any
 from logging.handlers import RotatingFileHandler
 
-from . config import *
+from .. labware import config
+
+LOG_LEVEL = config.getint("logging", "level")
+LOG_DIR = Path(config.get("logging", "dir"))
+LOG_SIZE = config.getint("logging", "size")
+LOG_COUNT = config.getint("logging", "count")
+LOG_FORMAT = config.get("logging", "format")
+CON_FORMAT = config.get("log_formats", "console")
+DATE_FORMAT = config.get("log_formats", "date")
 
 
 #-------------------------------------------------------------------
@@ -25,7 +33,7 @@ from . config import *
 class Logger(logging.Logger):
     """Custom labware logger class"""
 
-    def __init__(self, name: str, level: int = logging.INFO, **kwargs) -> None:
+    def __init__(self, name: str, level: int = LOG_LEVEL, **kwargs) -> None:
         """
         Initialize the logger with a name and level
 
@@ -169,3 +177,21 @@ def initStreamHandler(stream: TextIO | Any = sys.stdout, level: int = LOG_LEVEL,
     handler = logging.StreamHandler(stream)
     handler.setLevel(level)
     return handler
+
+
+#-------------------------------------------------------------------
+# MODULE FUNCTIONS
+#-------------------------------------------------------------------
+def getFormatter(name: str = LOG_FORMAT) -> logging.Formatter:
+    match name:
+        case "std":
+            msgFormat = config.get("log_formats", "std")
+        case "short":
+            msgFormat = config.get("log_formats", "short")
+        case "long":
+            msgFormat = config.get("log_formats", "long")
+        case "console":
+            msgFormat = config.get("log_formats", "console")
+        case _:
+            msgFormat = config.get("log_formats", "std")
+    return logging.Formatter(msgFormat, datefmt=DATE_FORMAT)

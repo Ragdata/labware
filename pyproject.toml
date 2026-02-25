@@ -24,9 +24,7 @@ classifiers = [
 ]
 dependencies = [
 	"typer",
-	"pydantic",
-	"zstandard",
-	"cachetools"
+	"sqlitedict"
 ]
 
 [project.urls]
@@ -36,9 +34,7 @@ Issues = "https://github.com/Ragdata/labware/issues"
 [project.optional-dependencies]
 all = [
 	"typer",
-	"pydantic",
-	"zstandard",
-	"cachetools"
+	"sqlitedict"
 ]
 dev = []
 docs = []
