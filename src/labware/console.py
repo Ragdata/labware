@@ -442,3 +442,5 @@ class Outlog(object):
         	**kwargs: Arbitrary keyword arguments.
         """
         self.logMessage(msg, level=logging.FATAL, style="error", **kwargs)
+
+

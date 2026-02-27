@@ -24,7 +24,8 @@ classifiers = [
 ]
 dependencies = [
 	"typer",
-	"sqlitedict"
+	"sqlitedict",
+	"jinja2"
 ]
 
 [project.urls]
@@ -34,13 +35,14 @@ Issues = "https://github.com/Ragdata/labware/issues"
 [project.optional-dependencies]
 all = [
 	"typer",
-	"sqlitedict"
+	"sqlitedict",
+	"jinja2"
 ]
 dev = []
 docs = []
 
 [project.scripts]
-lab = "labware.labfiles.cli:app"
+lab = "labware.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]
