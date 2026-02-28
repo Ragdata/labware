@@ -35,10 +35,10 @@ debug:
 install:
 	echo
 	# Check that a suitable environment exists
-	if [ "$(UID)" != 0 ]; then echo "This command MUST be run as root or with sudo privileges"; exit 1; fi
-	if [[ -z "$(which python3)" ]]; then echo "This package requires python version 3.12+ - install and try again"; exit 1; fi
-	if [[ -z "$(which pip)" ]]; then echo "This package requires pip - install and try again"; exit 1; fi
-	if [[ -n "$VIRTUAL_ENV" ]]; then echo "This package needs to be run in a virtual environment - create env and try again"; exit 1; fi
+	[ "$(UID)" != 0 ] && echo "This command MUST be run as root or with sudo privileges" && exit 1
+	[[ -z "$(which python3)" ]] && echo "This package requires python version 3.12+ - install and try again" && exit 1
+	[[ -z "$(which pip)" ]] && echo "This package requires pip - install and try again" && exit 1
+	[[ -n "$VIRTUAL_ENV" ]] && echo "This package needs to be run in a virtual environment - create env and try again" && exit 1
 
 	echo "Installing Labware in $(MODE) mode..."
 	try:
