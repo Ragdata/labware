@@ -34,8 +34,13 @@ debug:
 
 install:
 	echo
+	IFS='.'
+	read -r -a verlist <<< "$(python3 --version 2>/dev/null | awk '{print $2}')"
 	# Check that a suitable environment exists
 	[ "$(UID)" != 0 ] && echo "This command MUST be run as root or with sudo privileges" && exit 1
+	echo ${verlist[0]}
+	break
+
 	[[ -z "$(which python3)" ]] && echo "This package requires python version 3.12+ - install and try again" && exit 1
 	[[ -z "$(which pip)" ]] && echo "This package requires pip - install and try again" && exit 1
 	[[ -n "$VIRTUAL_ENV" ]] && echo "This package needs to be run in a virtual environment - create env and try again" && exit 1
