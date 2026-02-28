@@ -10,11 +10,17 @@ SYSDIR := "$(HOME)/.labware/sys"
 .PHONY: clean check install uninstall debug
 
 MODE := $(if $(DEV),dev,prod)
+USER := $(shell whoami)
+UID  := $(shell id -u)
+PWD  := $(shell pwd)
+
 
 check:
 	@echo "Running in $(MODE) mode."
+	@echo "Running as $(USER) with UID $(UID)"
 
 debug:
+	@echo "DEBUG: PWD=$(PWD)"
 	@echo "DEBUG: MODE=$(MODE)"
 	@echo "DEBUG: CUSTOM=$(CUSTOM)"
 	@echo "DEBUG: SYSDIR=$(SYSDIR)"
@@ -24,17 +30,17 @@ debug:
 	@echo "DEBUG: SHELLFLAGS=$(SHELLFLAGS)"
 	@echo "DEBUG: MAKEFLAGS=$(MAKEFLAGS)"
 
-setup:
-	@echo
-	@mkdir -p "$HOME/.dotfiles/custom" "$HOME/.labware/sys"
-
 install:
 	@echo
+	@if $(UID) != 0; then
+		@echo "This command MUST be run as root or with sudo privileges"
+		@exit 1
+	fi
 	@echo "Installing Labware in $(MODE) mode..."
 	@if [ "$(MODE)" == "dev" ]; then
-		$(VENV_PATH)/bin/pip install -e . -q
+		pip install -e . -q
 	else
-		$(VENV_PATH)/bin/pip install . -q
+		pip install . -q
 	fi
 	@echo "Labware installed successfully."
 	@if [ "$(MODE)" == "dev" ]; then

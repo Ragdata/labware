@@ -12,25 +12,23 @@ Copyright:		Copyright © 2026 Redeyed Technologies
 """
 import typer, rich, os
 
+import labware.install as installer
+
 from typing import Union
 from enum import Enum
 from typing_extensions import Annotated
 
 from . console import *
-from . install import *
 
-from . install import cmd as installer
-from . install import app as installApp
-
-from .. labware import config, log, outlog, registry
-from .. labware import __pkg_name__, __version__
+from . labware import config, log, outlog, registry
+from . labware import __pkg_name__, __version__
 
 #-------------------------------------------------------------------
 # Initialization
 #-------------------------------------------------------------------
 app = typer.Typer(name="labware", rich_markup_mode="rich", invoke_without_command=True)
 
-app.add_typer(installApp, name="install", help="Installer", rich_help_panel="Labware Subcommands")
+app.add_typer(installer.app, name="install", help="Installer", rich_help_panel="Labware Subcommands")
 
 
 @app.callback()
@@ -50,7 +48,7 @@ def env() -> None:
 @app.command()
 def install(debug: Annotated[bool, typer.Option("--debug", "-d", help="", rich_help_panel="Output Panel")] = False) -> None:
     """ Install the package and its dependencies. """
-
+    installer.cmd(debug=debug)
 
 @app.command()
 def uninstall():

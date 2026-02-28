@@ -14,8 +14,9 @@ import typer, subprocess, sys
 
 import labware.console as output
 
-from . console import *
-from .. labware import outlog, log as logger, registry
+from pathlib import Path
+
+from . labware import config, errorExit, outlog, log as logger, registry
 
 
 app = typer.Typer(name="install", rich_markup_mode="rich", no_args_is_help=True)
@@ -24,7 +25,8 @@ app = typer.Typer(name="install", rich_markup_mode="rich", no_args_is_help=True)
 #-------------------------------------------------------------------
 # MODULE VARIABLES
 #-------------------------------------------------------------------
-NEW_USER: str = ""
+NEW_USER: str
+SCR_PATH: Path = Path(__file__).resolve()
 
 #-------------------------------------------------------------------
 # MODULE COMMANDS
@@ -32,22 +34,35 @@ NEW_USER: str = ""
 def cmd(debug: Optional[bool] = False) -> None:
     """ Installer Entrypoint """
     try:
+        if not checkPython():
+            errorExit("Python version 3.10 or higher required", 1)
+        if debug:
+            output.printDebug(f"Script Path: {SCR_PATH}")
+            logger.debug(f"Installing Labware")
+        output.rule("[bold yellow]Installing Labware")
         output.line()
+
     except:
         pass
 
 #-------------------------------------------------------------------
 # MODULE FUNCTIONS
 #-------------------------------------------------------------------
-def run(cmd: str, check=True, capture=False, input_txt=None):
+def checkPython() -> bool:
+    """ Check if using a compatible version """
+    if sys.version_info >= (3, 10):
+        return False
+    return True
+
+def run(command: str, check=True, capture=False, input_txt=None):
     """ Execute shell command with error handling """
     try:
         if not capture:
-            printDot(f"{cmd}")
-        result = subprocess.run(cmd, shell=True, check=check, text=True, capture_output=capture, input=input_txt)
+            printDot(f"{command}")
+        result = subprocess.run(command, shell=True, check=check, text=True, capture_output=capture, input=input_txt)
         return result
     except subprocess.CalledProcessError as e:
-        outlog.logError(f"Command failed: {cmd}\n{e.stderr.strip()}")
+        outlog.logError(f"Command failed: {command}\n{e.stderr.strip()}")
         if check:
             sys.exit(1)
         return e

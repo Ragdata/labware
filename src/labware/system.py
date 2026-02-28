@@ -15,7 +15,7 @@ import subprocess, sys, os, getpass, shutil, time
 from pathlib import Path
 
 from . console import *
-from .. labware import config, log, outlog, errorExit
+from . labware import config, log, outlog, errorExit
 
 
 #-------------------------------------------------------------------

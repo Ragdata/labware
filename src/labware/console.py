@@ -19,7 +19,7 @@ from rich.console import Console, ConsoleOptions, RenderableType
 
 from typing import Optional, Union
 
-from .. labware import config
+from . labware import config
 
 _theme = Theme({
     "info": config.get("styles", "info"),

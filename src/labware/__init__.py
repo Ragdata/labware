@@ -35,10 +35,6 @@ env = Environment(loader=PackageLoader('labware'), autoescape=True)
 
 from . logger import LOG_LEVEL, LOG_SIZE, LOG_COUNT, LOG_FORMAT
 
-register = Path.home() / '.labware/registry'
-
-registry = SqliteDict(register, autocommit=True)
-registry.close()
 
 #-------------------------------------------------------------------
 # MODULE FUNCTIONS
@@ -62,10 +58,6 @@ def getFileLogger(name: str, level: int = LOG_LEVEL, fmt: str = LOG_FORMAT) -> L
     log.addHandler(handler)
     return log
 
-log = getFileLogger(__pkg_name__, LOG_LEVEL, LOG_FORMAT)
-
-outlog = Outlog(log)
-
 def errorExit(msg: str, code: int = 1, exc: Exception | None = None) -> None:
     """ Log an error message and exit the program """
     outlog.logError(msg)
@@ -73,3 +65,18 @@ def errorExit(msg: str, code: int = 1, exc: Exception | None = None) -> None:
         raise exc
     else:
         sys.exit(code)
+
+
+#-------------------------------------------------------------------
+# MODULE OBJECTS
+#-------------------------------------------------------------------
+log = getFileLogger(__pkg_name__, LOG_LEVEL, LOG_FORMAT)
+
+outlog = Outlog(log)
+
+register = Path.home() / '.labware/registry'
+
+if register.exists():
+    registry = SqliteDict(register, autocommit=True)
+    registry.close()
+
