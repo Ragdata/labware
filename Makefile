@@ -39,7 +39,6 @@ install:
 	# Check that a suitable environment exists
 	[ "$(UID)" != 0 ] && echo "This command MUST be run as root or with sudo privileges" && exit 1
 	echo ${verlist[0]}
-	break
 
 	[[ -z "$(which python3)" ]] && echo "This package requires python version 3.12+ - install and try again" && exit 1
 	[[ -z "$(which pip)" ]] && echo "This package requires pip - install and try again" && exit 1
