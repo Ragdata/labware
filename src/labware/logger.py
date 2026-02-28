@@ -19,7 +19,7 @@ from logging.handlers import RotatingFileHandler
 from . labware import config
 
 LOG_LEVEL = config.getint("logging", "level")
-LOG_DIR = Path(config.get("logging", "dir"))
+LOG_DIR = Path(config.get("logging", "logdir"))
 LOG_SIZE = config.getint("logging", "size")
 LOG_COUNT = config.getint("logging", "count")
 LOG_FORMAT = config.get("logging", "format")
