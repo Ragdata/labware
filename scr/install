@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+####################################################################
+# install
+####################################################################
+# Ragdata's Dotfiles - Dotfile Installer
+#
+# File:         install
+# Author:       Ragdata
+# Date:         01/03/2026
+# License:      MIT License
+# Repository:	https://github.com/Ragdata/.dotfiles
+# Copyright:    Copyright © 2026 Redeyed Technologies
+####################################################################
+# PREFLIGHT
+####################################################################
+echo
+if "$DEV"; then MODE=dev; else MODE=prod; fi
+IFS='.'
+
+####################################################################
+# CHECKS
+####################################################################
+[ "$UID" != 0 ] && echo"This command MUST be run as root or with sudo privileges" && exit 1
+
+read -r -a verlist <<< "$(python3 --version 2>/dev/null | awk '{print $2}')"
+
+echo "${verlist[0]}"
