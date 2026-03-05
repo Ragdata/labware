@@ -36,6 +36,7 @@ def pyenvInstall(check=True):
 		subprocess.run("echo 'export PYENV_ROOT=\"$HOME/.pyenv\"' >> ~/.profile")
 		subprocess.run("echo '[[ -d $PYENV_ROOT/bin ]] && export PATH=\"$PYENV_ROOT/bin:$PATH\"' >> ~/.profile")
 		subprocess.run("echo 'eval \"$(pyenv init - bash)\"' >> ~/.profile")
+
 		# Install Plugins
 		plugins = input("Do you want to install pyenv plugins? (y/n): ").lower()
 		if plugins == "y":
