@@ -43,26 +43,26 @@ if [ -d "$HOME/.local/bin" ] ; then PATH="$HOME/.local/bin:$PATH"; fi
 #-------------------------------------------------------------------
 checkOverride()
 {
-        srcfile="$1"
+	srcfile="$1"
 
-        bashindex=$(echo "$srcfile" | awk '{print index($0, "'"/.bashrc.d"'")}')
-        sysindex=$(echo "$srcfile" | awk '{print index($0, "'"/sys"'")}')
+	bashindex=$(echo "$srcfile" | awk '{print index($0, "'"/.bashrc.d"'")}')
+	sysindex=$(echo "$srcfile" | awk '{print index($0, "'"/sys"'")}')
 
-        if (( $bashindex != 0 )); then
-                # Source file is in .bashrc.d directory
-                destfile="$CUSTOM/dots/.bashrc.d/$(basename "$srcfile")"
-        elif (( $sysindex != 0 )); then
-                # Source file is in .dotfiles/sys directory
-                destfile="$CUSTOM/${srcfile#$SYSDIR/}"
-        else
-                echo "$srcfile"
-        fi
-        # Determine if override file exists
-        if [[ -f "$destfile" ]]; then
-                echo "$destfile"
-        else
-                echo "$srcfile"
-        fi
+	if (( $bashindex != 0 )); then
+		# Source file is in .bashrc.d directory
+		destfile="$CUSTOM/dots/.bashrc.d/$(basename "$srcfile")"
+	elif (( $sysindex != 0 )); then
+		# Source file is in .dotfiles/sys directory
+		destfile="$CUSTOM/${srcfile#$SYSDIR/}"
+	else
+		echo "$srcfile"
+	fi
+	# Determine if override file exists
+	if [[ -f "$destfile" ]]; then
+		echo "$destfile"
+	else
+		echo "$srcfile"
+	fi
 }
 #-------------------------------------------------------------------
 # SETUP SHELL
@@ -104,7 +104,7 @@ umask 022
 # Disable Alacritty icon bouncing for interactive shells.
 # Refer to: https://is.gd/8MPdGh
 if [[ $- =~ i ]]; then
-        printf "\e[?1042l"
+	printf "\e[?1042l"
 fi
 # PROMPT_COMMAND='history -a'
 
@@ -112,16 +112,16 @@ fi
 # and make sure that everything gets to where it ought to be.
 include()
 {
-        for script in "$1"/*
-        do
-                [[ ! -f "$script" && ! -L "$script" ]] && continue
-                # Check for an override file
-                script=$(checkOverride "$script")
-                # Check if the file is a symlink
-                [[ -L "$script" ]] && script=$(readlink -f "$script")
-                # Source the script
-                source "$script" || { echo "Error sourcing script: $script"; continue; }
-        done
+	for script in "$1"/*
+	do
+		[[ ! -f "$script" && ! -L "$script" ]] && continue
+		# Check for an override file
+		script=$(checkOverride "$script")
+		# Check if the file is a symlink
+		[[ -L "$script" ]] && script=$(readlink -f "$script")
+		# Source the script
+		source "$script" || { echo "Error sourcing script: $script"; continue; }
+	done
 }
 
 [ -d "$HOME/.bashrc.d" ] && include "$HOME/.bashrc.d"
