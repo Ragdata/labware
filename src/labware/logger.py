@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import TextIO, Any
 from logging.handlers import RotatingFileHandler
 
-from . labware import config
+from labware import config
 
 LOG_LEVEL = config.getint("logging", "level")
 LOG_DIR = Path(config.get("logging", "logdir"))

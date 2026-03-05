@@ -10,14 +10,14 @@ Repository:		https://github.com/Ragdata/labware
 Copyright:		Copyright © 2026 Redeyed Technologies
 ====================================================================
 """
-import typer, subprocess, sys
-
-import labware.console as output
+import typer, subprocess, sys, os
 
 from pathlib import Path
+from typing import Optional
 
-from . labware import config, errorExit, outlog, log as logger, registry
+from labware import config, log as logger, outlog, errorExit
 
+from . console import *
 
 app = typer.Typer(name="install", rich_markup_mode="rich", no_args_is_help=True)
 
@@ -27,6 +27,7 @@ app = typer.Typer(name="install", rich_markup_mode="rich", no_args_is_help=True)
 #-------------------------------------------------------------------
 NEW_USER: str
 SCR_PATH: Path = Path(__file__).resolve()
+REPO_PATH: Path = SCR_PATH.parent.parent
 
 #-------------------------------------------------------------------
 # MODULE COMMANDS
@@ -35,12 +36,19 @@ def cmd(debug: Optional[bool] = False) -> None:
     """ Installer Entrypoint """
     try:
         if not checkPython():
-            errorExit("Python version 3.10 or higher required", 1)
+            errorExit("Python version 3.12 or higher required", 1)
+        if not checkUser():
+            errorExit("This package MUST be run as root or with sudo privileges", 1)
+        # CHECK VENV
+
+        # INSTALL LABWARE
         if debug:
-            output.printDebug(f"Script Path: {SCR_PATH}")
+            printDebug(f"Script Path: {SCR_PATH}")
+            printDebug(f"Repo Path: {REPO_PATH}")
             logger.debug(f"Installing Labware")
-        output.rule("[bold yellow]Installing Labware")
-        output.line()
+        rule("[bold yellow]Installing Labware")
+        line()
+        # Create Directories
 
     except:
         pass
@@ -50,9 +58,31 @@ def cmd(debug: Optional[bool] = False) -> None:
 #-------------------------------------------------------------------
 def checkPython() -> bool:
     """ Check if using a compatible version """
-    if sys.version_info >= (3, 10):
+    if sys.version_info >= (3, 12):
         return False
-    return True
+    else:
+        return True
+
+def checkUser() -> bool:
+    if os.geteuid() != 0:
+        return False
+    else:
+        return True
+
+def checkPyenv():
+    currdir = os.path.dirname(__file__)
+    pkgdir = os.path.abspath(os.path.join(currdir, "..", "..", "pkg", "primary"))
+
+    if pkgdir not in sys.path:
+        sys.path.insert(0, pkgdir)
+
+    from pyenv import pyenvCheck
+
+
+    # pkgdir = REPO_PATH / 'pkg/primary'
+    # sys.path.append(str(pkgdir))
+    # import ../../pkg/primary
+
 
 def run(command: str, check=True, capture=False, input_txt=None):
     """ Execute shell command with error handling """

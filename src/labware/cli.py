@@ -20,8 +20,9 @@ from typing_extensions import Annotated
 
 from . console import *
 
-from . labware import config, log, outlog, registry
-from . labware import __pkg_name__, __version__
+from labware import config, log as logger, outlog, registry
+from labware import __pkg_name__, __version__
+
 
 #-------------------------------------------------------------------
 # Initialization

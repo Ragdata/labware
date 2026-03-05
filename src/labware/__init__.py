@@ -10,14 +10,17 @@ Repository:		https://github.com/Ragdata/labware
 Copyright:		Copyright © 2026 Redeyed Technologies
 ====================================================================
 """
-import sys
+import sys, os
 
 from pathlib import Path
 from configparser import ConfigParser
 from sqlitedict import SqliteDict
 from jinja2 import Environment, PackageLoader
 
+from labware import log as logger, outlog, registry
+
 from . logger import Logger, getFormatter, initRotatingFileHandler
+from . logger import LOG_LEVEL, LOG_SIZE, LOG_COUNT, LOG_FORMAT
 from . console import *
 
 __pkg_name__ = 'labware'
@@ -32,8 +35,6 @@ if user_cfg.exists():
     config.read(user_cfg)
 
 env = Environment(loader=PackageLoader('labware'), autoescape=True)
-
-from . logger import LOG_LEVEL, LOG_SIZE, LOG_COUNT, LOG_FORMAT
 
 
 #-------------------------------------------------------------------
@@ -74,9 +75,8 @@ log = getFileLogger(__pkg_name__, LOG_LEVEL, LOG_FORMAT)
 
 outlog = Outlog(log)
 
-register = Path.home() / '.labware/registry'
+register = Path.home() / ".labware/registry"
 
-if register.exists():
-    registry = SqliteDict(register, autocommit=True)
-    registry.close()
+registry = SqliteDict(register, autocommit=True)
+registry.close()
 

@@ -4,8 +4,8 @@ MAKEFLAGS += --silent
 
 SHELL := /bin/bash
 
-CUSTOM := "$(HOME)/.dotfiles/custom"
-SYSDIR := "$(HOME)/.labware/sys"
+REPODIR := "$(PWD)"
+BASEDIR := "$(HOME)/.labware"
 
 MODE := $(if $(DEV),dev,prod)
 
@@ -18,10 +18,9 @@ clean:
 debug:
 	echo "Running in $(MODE) mode."
 	echo "Running as $(USER) with UID $(UID)"
-	echo "DEBUG: PWD=$(PWD)"
 	echo "DEBUG: MODE=$(MODE)"
-	echo "DEBUG: CUSTOM=$(CUSTOM)"
-	echo "DEBUG: SYSDIR=$(SYSDIR)"
+	echo "DEBUG: REPODIR=$(PWD)"
+	echo "DEBUG: BASEDIR=$(BASEDIR)"
 	echo "DEBUG: VIRTUAL_ENV=$(VIRTUAL_ENV)"
 	echo "DEBUG: PATH=$(PATH)"
 	echo "DEBUG: SHELL=$(SHELL)"
@@ -29,20 +28,23 @@ debug:
 	echo "DEBUG: MAKEFLAGS=$(MAKEFLAGS)"
 
 install:
-	
-#	try:
-#		if [ "$(MODE)" == "dev" ]; then pip install -e . -q; else pip install . -q; fi
-#	except Exception as e:
-#		raise Exception(e)
-#		echo "There was a problem installing the Labware module"
-#		exit 1
+	if [[ "$(MODE)" != "dev" ]]; then
+		apt update
+		apt full-upgrade -y
+		apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl wget git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+		apt autoremove -y && apt clean
+	fi
 
-#	# Execute Labware Installer
-#	if [ "$(MODE)" == "dev" ]; then
-#		lab install --debug
-#	 else
-#		lab install
-#	fi
+	if [[ ! -d "$(HOME)/.pyenv" ]]; then
+
+	fi
+	if [[ "$(MODE)" == "dev" ]]; then
+		pip install -e . -q
+		lab install --debug
+	else
+		pip install . -q
+		lab install
+	fi
 
 test:
 	echo
