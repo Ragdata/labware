@@ -24,4 +24,4 @@ Subsystem sftp /usr/lib/openssh/sftp-server
 
 Protocol 2
 
-AllowUsers root {{ user }}
+AllowUsers root {{ NEW_USER }}
