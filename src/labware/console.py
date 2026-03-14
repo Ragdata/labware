@@ -18,8 +18,9 @@ from rich.measure import Measurement
 from rich.console import Console, ConsoleOptions, RenderableType
 
 from typing import Optional, Union
+from pathlib import Path
 
-from . labware import config
+from src.labware import config
 
 _theme = Theme({
     "info": config.get("styles", "info"),
@@ -359,6 +360,8 @@ class Outlog(object):
         """
         if self._logger.isEnabledFor(level):
             self._logger.log(level, msg)
+        else:
+            return
         symbol = None
         match style:
             case "debug":

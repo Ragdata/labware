@@ -10,21 +10,18 @@ Repository:		https://github.com/Ragdata/labware
 Copyright:		Copyright © 2026 Redeyed Technologies
 ====================================================================
 """
-import sys, os
+import sys
 
-from pathlib import Path
 from configparser import ConfigParser
 from sqlitedict import SqliteDict
 from jinja2 import Environment, PackageLoader
-
-from labware import log as logger, outlog, registry
 
 from . logger import Logger, getFormatter, initRotatingFileHandler
 from . logger import LOG_LEVEL, LOG_SIZE, LOG_COUNT, LOG_FORMAT
 from . console import *
 
 __pkg_name__ = 'labware'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 config = ConfigParser()
 config.read('labware/.default.cfg')

@@ -4,9 +4,6 @@ MAKEFLAGS += --silent
 
 SHELL := /bin/bash
 
-REPODIR := "$(PWD)"
-BASEDIR := "$(HOME)/.labware"
-
 MODE := $(if $(DEV),dev,prod)
 
 .PHONY: clean check install uninstall debug
@@ -28,26 +25,12 @@ debug:
 	echo "DEBUG: MAKEFLAGS=$(MAKEFLAGS)"
 
 install:
-	if [[ "$(MODE)" != "dev" ]]; then
-		apt update
-		apt full-upgrade -y
-		apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl wget git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-		apt autoremove -y && apt clean
-	fi
-
-	if [[ ! -d "$(HOME)/.pyenv" ]]; then
-
-	fi
-	if [[ "$(MODE)" == "dev" ]]; then
-		pip install -e . -q
-		lab install --debug
-	else
-		pip install . -q
-		lab install
-	fi
+	./scr/install.sh
 
 test:
 	echo
 
 uninstall:
 	echo
+	pyenv uninstall labenv
+

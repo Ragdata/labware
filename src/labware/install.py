@@ -10,12 +10,12 @@ Repository:		https://github.com/Ragdata/labware
 Copyright:		Copyright © 2026 Redeyed Technologies
 ====================================================================
 """
-import typer, subprocess, sys, os
+import typer, subprocess, shutil, sys, os
 
 from pathlib import Path
 from typing import Optional
 
-from labware import config, log as logger, outlog, errorExit
+from src.labware import config, log as logger, outlog, errorExit
 
 from . console import *
 
@@ -34,22 +34,21 @@ REPO_PATH: Path = SCR_PATH.parent.parent
 #-------------------------------------------------------------------
 def cmd(debug: Optional[bool] = False) -> None:
     """ Installer Entrypoint """
+    if not checkPython():
+        errorExit("Python version 3.12 or higher required", 1)
+    if not checkUser():
+        errorExit("This package MUST be run as root or with sudo privileges", 1)
     try:
-        if not checkPython():
-            errorExit("Python version 3.12 or higher required", 1)
-        if not checkUser():
-            errorExit("This package MUST be run as root or with sudo privileges", 1)
-        # CHECK VENV
-
-        # INSTALL LABWARE
         if debug:
-            printDebug(f"Script Path: {SCR_PATH}")
+            printDebug(f"Module Path: {SCR_PATH}")
             printDebug(f"Repo Path: {REPO_PATH}")
-            logger.debug(f"Installing Labware")
+        logger.info("Installing Labware")
         rule("[bold yellow]Installing Labware")
         line()
-        # Create Directories
-
+        copyFiles(debug)
+        new_user = input("Do you want to create a new sudo user? (Y/n): ").lower()
+        if new_user == "y" or not new_user:
+            pass
     except:
         pass
 
@@ -69,20 +68,26 @@ def checkUser() -> bool:
     else:
         return True
 
-def checkPyenv():
-    currdir = os.path.dirname(__file__)
-    pkgdir = os.path.abspath(os.path.join(currdir, "..", "..", "pkg", "primary"))
-
-    if pkgdir not in sys.path:
-        sys.path.insert(0, pkgdir)
-
-    from pyenv import pyenvCheck
-
-
-    # pkgdir = REPO_PATH / 'pkg/primary'
-    # sys.path.append(str(pkgdir))
-    # import ../../pkg/primary
-
+def copyFiles(debug: Optional[bool] = False) -> bool:
+    try:
+        for name, stub in config['dirs'].items():
+            repodir = REPO_PATH / stub
+            userdir = Path.home() / '.labware' / stub
+            if not userdir.exists():
+                os.mkdir(userdir, 0o755)
+            for filename in os.scandir(repodir):
+                filepath = filename.path
+                userpath = userdir / filename.name
+                if debug:
+                    outlog.logDebug(f"Copying '{filepath}' to '{userpath}'")
+                if filename.is_file():
+                    shutil.copy2(filepath, userdir)
+                elif filename.is_dir():
+                    shutil.copytree(filepath, userpath)
+    except Exception as e:
+        errorExit("File Copy Error")
+        return False
+    return True
 
 def run(command: str, check=True, capture=False, input_txt=None):
     """ Execute shell command with error handling """

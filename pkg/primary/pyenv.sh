@@ -21,21 +21,21 @@ pyenv::install()
 pyenv::config()
 {
 	{
-		echo "export PYENV_ROOT=\"$HOME/.pyenv\""
-		echo "[[ -d $PYENV_ROOT/bin ]] && export PATH=\"$PYENV_ROOT/bin:$PATH\""
-		echo "eval $(pyenv init - bash)"
+		echo "export PYENV_ROOT=\"\$HOME/.pyenv\""
+		echo "[[ -d \$PYENV_ROOT/bin ]] && export PATH=\"\$PYENV_ROOT/bin:\$PATH\""
+		echo "eval \$(pyenv init - bash)"
 	} >> ~/.bashrc
 	{
-		echo "export PYENV_ROOT=\"$HOME/.pyenv\""
-		echo "[[ -d $PYENV_ROOT/bin ]] && export PATH=\"$PYENV_ROOT/bin:$PATH\""
-		echo "eval $(pyenv init - bash)"
+		echo "export PYENV_ROOT=\"\$HOME/.pyenv\""
+		echo "[[ -d \$PYENV_ROOT/bin ]] && export PATH=\"\$PYENV_ROOT/bin:\$PATH\""
+		echo "eval \$(pyenv init - bash)"
 	} >> ~/.profile
 }
 
 pyenv::plugins()
 {
 	git clone https://github.com/pyenv/pyenv-virtualenv.git "$HOME/.pyenv/plugins/pyenv-virtualenv"
-	echo "eval $(pyenv virtualenv-init -)" >> ~/.bashrc
+	echo "eval \$(pyenv virtualenv-init -)" >> ~/.bashrc
 	git clone https://github.com/pyenv/pyenv-update.git "$HOME/.pyenv/plugins/pyenv-update"
 }
 
