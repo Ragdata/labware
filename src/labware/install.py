@@ -30,43 +30,31 @@ SCR_PATH: Path = Path(__file__).resolve()
 REPO_PATH: Path = SCR_PATH.parent.parent
 
 #-------------------------------------------------------------------
-# MODULE COMMANDS
-#-------------------------------------------------------------------
-def cmd(debug: Optional[bool] = False) -> None:
-    """ Installer Entrypoint """
-    if not checkPython():
-        errorExit("Python version 3.12 or higher required", 1)
-    if not checkUser():
-        errorExit("This package MUST be run as root or with sudo privileges", 1)
-    try:
-        if debug:
-            printDebug(f"Module Path: {SCR_PATH}")
-            printDebug(f"Repo Path: {REPO_PATH}")
-        logger.info("Installing Labware")
-        rule("[bold yellow]Installing Labware")
-        line()
-        copyFiles(debug)
-        new_user = input("Do you want to create a new sudo user? (Y/n): ").lower()
-        if new_user == "y" or not new_user:
-            pass
-    except:
-        pass
-
-#-------------------------------------------------------------------
 # MODULE FUNCTIONS
 #-------------------------------------------------------------------
-def checkPython() -> bool:
-    """ Check if using a compatible version """
-    if sys.version_info >= (3, 12):
-        return False
-    else:
-        return True
+def appBanner(debug: Optional[bool] = False) -> None:
+    logger.info("Labware Installer Started")
+    rule("[bold yellow]Labware Installer")
+    line()
 
-def checkUser() -> bool:
-    if os.geteuid() != 0:
-        return False
+def checkPython() -> None:
+    if sys.version_info <= (3, 12):
+        errorExit(f"Requires Python 3.12 or later")
     else:
-        return True
+        printSuccess("Python 3.12 or later confirmed")
+
+def checkRoot() -> None:
+    if os.geteuid() != 0:
+        errorExit(f"Root privileges required")
+    else:
+        printSuccess("Root privileges confirmed")
+
+def checkUbuntu() -> None:
+    version = run("lsb_release -rs", capture=True).stdout.strip()
+    if version != "24.04":
+        errorExit(f"Expected Ubuntu 24.04, found '{version}'")
+    else:
+        printSuccess("Ubuntu 24.04 confirmed")
 
 def copyFiles(debug: Optional[bool] = False) -> bool:
     try:
@@ -128,3 +116,38 @@ def promptUsername():
                 NEW_USER = user
                 break
             printError(f"Use lowercase alphanumeric, max 32 chars")
+
+def userExists():
+    return run(f"id {NEW_USER}", check=False, capture=True).returncode == 0
+
+
+#-------------------------------------------------------------------
+# MODULE COMMANDS
+#-------------------------------------------------------------------
+def cmd(debug: Optional[bool] = False) -> None:
+    """ Installer Entrypoint """
+    appBanner(debug)
+    checkRoot()
+    checkUbuntu()
+    checkPython()
+
+    # if not checkUser():
+    #     errorExit("This package MUST be run as root or with sudo privileges", 1)
+    # if not checkUbuntu():
+    #     errorExit("")
+    # if not checkPython():
+    #     errorExit("Python version 3.12 or higher required", 1)
+    # try:
+    #     if debug:
+    #         printDebug(f"Module Path: {SCR_PATH}")
+    #         printDebug(f"Repo Path: {REPO_PATH}")
+    #     logger.info("Installing Labware")
+    #     rule("[bold yellow]Installing Labware")
+    #     line()
+    #     copyFiles(debug)
+    #     new_user = input("Do you want to create a new sudo user? (Y/n): ").lower()
+    #     if new_user == "y" or not new_user:
+    #         promptUsername()
+    # except Exception as e:
+    #     raise e
+
