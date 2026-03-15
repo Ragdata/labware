@@ -106,7 +106,7 @@ else
 	echo -e "${GREEN}Successfully reloaded shell${NC}"
 fi
 
-echo -e "${YELLOW}Setting Up Virtual Environment ...${NC}"
+echo -e "${YELLOW}Installing Python ...${NC}"
 if ! pyenv install 3.14:latest; then
 	echo -e "${RED}Failed to install python${NC}"
 	exit 1
@@ -119,7 +119,8 @@ if ! pyenv global 3.14; then
 else
 	echo -e "${GREEN}Successfully set global python version${NC}"
 fi
-if [ ! -L "$HOME/.pyenv/versions/labenv" ]; then
+echo -e "${YELLOW}Setting Up Virtual Environment ...${NC}"
+if [ ! -d "$HOME/.pyenv/versions/labenv" ]; then
 	if pyenv virtualenv labenv; then
 		echo -e "${GREEN}Successfully created virtual environment${NC}"
 	else

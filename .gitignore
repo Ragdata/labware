@@ -10,7 +10,7 @@ build/
 .idea
 !.idea/icon.svg
 
-.python-version
+.archive/.python-version
 
 **/.env
 **/.env.*
