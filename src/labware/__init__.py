@@ -24,7 +24,7 @@ __pkg_name__ = 'labware'
 __version__ = '0.1.1'
 
 config = ConfigParser()
-config.read('labware/.default.cfg')
+config.read('labware/config/.default.cfg')
 
 user_dir = Path.home()
 user_cfg = user_dir / '.labware.cfg'
