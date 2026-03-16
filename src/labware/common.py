@@ -24,6 +24,10 @@ if user_cfg.exists():
     config.read(str(user_cfg))
 
 register = Path.home() / ".labware/registry"
+regisdir = register.parent
+
+if not regisdir.exists():
+    regisdir.mkdir(parents=True, exist_ok=True)
 
 registry = SqliteDict(register, autocommit=True)
 registry.close()

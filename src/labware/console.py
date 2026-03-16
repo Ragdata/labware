@@ -21,7 +21,7 @@ from typing import Optional, Union
 from pathlib import Path
 
 from labware import config
-from logger import outlog
+from . logger import *
 
 _theme = Theme({
     "info": config.get("styles", "info"),
@@ -97,7 +97,7 @@ def printHeader(style: Optional[str] = None, banner: Optional[Path] = None, **kw
 	Print the dotfiles banner and copyright information.
 	"""
     msg = ""
-    if banner.exists():
+    if banner and banner.exists():
         with open(banner, 'r') as f:
             for lne in f:
                 msg += lne
@@ -336,7 +336,3 @@ def errorExit(msg: str, code: int = 1, exc: Exception | None = None) -> None:
         raise exc
     else:
         sys.exit(code)
-
-
-
-

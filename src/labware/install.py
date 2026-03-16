@@ -18,13 +18,15 @@ from typing import Optional
 from . logger import *
 from . console import *
 
+from labware import log as logger, config
+
 app = typer.Typer(name="install", rich_markup_mode="rich", no_args_is_help=True)
 
 
 #-------------------------------------------------------------------
 # MODULE VARIABLES
 #-------------------------------------------------------------------
-NEW_USER: str
+NEW_USER: str = ""
 SCR_PATH: Path = Path(__file__).resolve()
 REPO_PATH: Path = SCR_PATH.parent.parent
 
@@ -37,7 +39,7 @@ def appBanner(debug: Optional[bool] = False) -> None:
     line()
 
 def checkPython() -> None:
-    if sys.version_info <= (3, 12):
+    if sys.version_info < (3, 12):
         errorExit(f"Requires Python 3.12 or later")
     else:
         printSuccess("Python 3.12 or later confirmed")
@@ -61,18 +63,21 @@ def copyFiles(debug: Optional[bool] = False) -> bool:
             repodir = REPO_PATH / stub
             userdir = Path.home() / '.labware' / stub
             if not userdir.exists():
-                os.mkdir(userdir, 0o755)
-            for filename in os.scandir(repodir):
-                filepath = filename.path
-                userpath = userdir / filename.name
-                if debug:
-                    outlog.logDebug(f"Copying '{filepath}' to '{userpath}'")
-                if filename.is_file():
-                    shutil.copy2(filepath, userdir)
-                elif filename.is_dir():
-                    shutil.copytree(filepath, userpath)
+                userdir.mkdir(parents=True, exist_ok=True)
+            if repodir.exists():
+                for filename in os.scandir(repodir):
+                    filepath = filename.path
+                    userpath = userdir / filename.name
+                    if debug:
+                        outlog.logDebug(f"Copying '{filepath}' to '{userpath}'")
+                    if filename.is_file():
+                        shutil.copy2(filepath, userpath)
+                    elif filename.is_dir() and not userpath.exists():
+                        shutil.copytree(filepath, userpath)
+            else:
+                outlog.logWarning(f"Source directory '{repodir}' does not exist")
     except Exception as e:
-        errorExit("File Copy Error")
+        outlog.logError(f"File Copy Error: {e}")
         return False
     return True
 
@@ -149,4 +154,3 @@ def cmd(debug: Optional[bool] = False) -> None:
     #         promptUsername()
     # except Exception as e:
     #     raise e
-

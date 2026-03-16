@@ -47,11 +47,6 @@ def env() -> None:
         printMessage(f"{key}: {value}")
 
 @app.command()
-def install(debug: Annotated[bool, typer.Option("--debug", "-d", help="", rich_help_panel="Output Panel")] = False) -> None:
-    """ Install the package and its dependencies. """
-    installer.cmd(debug=debug)
-
-@app.command()
 def uninstall():
     pass
 
