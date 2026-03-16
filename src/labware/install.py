@@ -15,8 +15,7 @@ import typer, subprocess, shutil, sys, os
 from pathlib import Path
 from typing import Optional
 
-from src.labware import config, log as logger, outlog, errorExit
-
+from . logger import *
 from . console import *
 
 app = typer.Typer(name="install", rich_markup_mode="rich", no_args_is_help=True)

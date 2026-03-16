@@ -10,7 +10,7 @@ Repository:		https://github.com/Ragdata/labware
 Copyright:		Copyright © 2026 Redeyed Technologies
 ====================================================================
 """
-import logging
+import sys
 
 from rich.text import Text
 from rich.theme import Theme
@@ -20,7 +20,8 @@ from rich.console import Console, ConsoleOptions, RenderableType
 from typing import Optional, Union
 from pathlib import Path
 
-from src.labware import config
+from labware import config
+from logger import outlog
 
 _theme = Theme({
     "info": config.get("styles", "info"),
@@ -328,122 +329,14 @@ def status(arg: Union[str, Text], **kwargs) -> None:
 	"""
     console.status(arg, **kwargs)
 
+def errorExit(msg: str, code: int = 1, exc: Exception | None = None) -> None:
+    """ Log an error message and exit the program """
+    outlog.logError(msg)
+    if exc is not None:
+        raise exc
+    else:
+        sys.exit(code)
 
-#-------------------------------------------------------------------
-# OutLog Class
-#-------------------------------------------------------------------
-class Outlog(object):
-    """
-    A class to handle console message with concurrent logging
-    """
 
-    _logger = None
-
-    def __init__(self, logger):
-        """
-        Initialize the OutLog instance.
-
-        Args:
-        	logger: An optional logger instance for logging messages.
-        """
-        self._logger = logger
-
-    def logMessage(self, msg: str, level: int = config.get("logging", "level"), style: Optional[str] = None, **kwargs) -> None:
-        """
-        Log and print a message with an optional style.
-
-        Args:
-        	msg (str):      The message to log and print.
-        	level (int):    The level of the message to log and print.
-        	style (str):    The style to apply to the message. (Optional)
-        	**kwargs:       Arbitrary keyword arguments.
-        """
-        if self._logger.isEnabledFor(level):
-            self._logger.log(level, msg)
-        else:
-            return
-        symbol = None
-        match style:
-            case "debug":
-                symbol = config.get("symbols", "debug")
-            case "info":
-                symbol = config.get("symbols", "info")
-            case "warning":
-                symbol = config.get("symbols", "warning")
-            case "error":
-                symbol = config.get("symbols", "error")
-        if symbol is not None:
-            msg = f"{symbol} " + msg
-        printMessage(msg, style=style, **kwargs)
-
-    def logDebug(self, msg: str, **kwargs) -> None:
-        """
-        Log a DEBUG message.
-
-        Args:
-        	msg (str): The message to log.
-        	**kwargs: Arbitrary keyword arguments.
-        """
-        self.logMessage(msg, level=logging.DEBUG, style="debug", **kwargs)
-
-    def logInfo(self, msg: str, **kwargs) -> None:
-        """
-        Log an INFO message.
-
-        Args:
-        	msg (str): The message to log.
-        	**kwargs: Arbitrary keyword arguments.
-        """
-        self.logMessage(msg, level=logging.INFO, style="info", **kwargs)
-
-    def logWarning(self, msg: str, **kwargs) -> None:
-        """
-        Log a WARNING message.
-
-        Args:
-        	msg (str): The message to log.
-        	**kwargs: Arbitrary keyword arguments.
-        """
-        self.logMessage(msg, level=logging.WARNING, style="warning", **kwargs)
-
-    def logError(self, msg: str, **kwargs) -> None:
-        """
-        Log an ERROR message.
-
-        Args:
-        	msg (str): The message to log.
-        	**kwargs: Arbitrary keyword arguments.
-        """
-        self.logMessage(msg, level=logging.ERROR, style="error", **kwargs)
-
-    def logSuccess(self, msg: str, **kwargs) -> None:
-        """
-        Log a SUCCESS message.
-
-        Args:
-        	msg (str): The message to log.
-        	**kwargs: Arbitrary keyword arguments.
-        """
-        self.logMessage(msg, level=logging.INFO, style="success", **kwargs)
-
-    def logCritical(self, msg: str, **kwargs) -> None:
-        """
-        Log an ERROR message.
-
-        Args:
-        	msg (str): The message to log.
-        	**kwargs: Arbitrary keyword arguments.
-        """
-        self.logMessage(msg, level=logging.CRITICAL, style="error", **kwargs)
-
-    def logFatal(self, msg: str, **kwargs) -> None:
-        """
-        Log an ERROR message.
-
-        Args:
-        	msg (str): The message to log.
-        	**kwargs: Arbitrary keyword arguments.
-        """
-        self.logMessage(msg, level=logging.FATAL, style="error", **kwargs)
 
 

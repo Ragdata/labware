@@ -13,18 +13,28 @@ Copyright:		Copyright © 2026 Redeyed Technologies
 import sys, logging
 
 from pathlib import Path
-from typing import TextIO, Any
+from typing import Optional, TextIO, Any
 from logging.handlers import RotatingFileHandler
 
-from labware import config
+from labware import __pkg_name__
 
-LOG_LEVEL = config.getint("logging", "level")
-LOG_DIR = Path(config.get("logging", "logdir"))
-LOG_SIZE = config.getint("logging", "size")
-LOG_COUNT = config.getint("logging", "count")
-LOG_FORMAT = config.get("logging", "format")
-CON_FORMAT = config.get("log_formats", "console")
-DATE_FORMAT = config.get("log_formats", "date")
+from . common import config
+from . console import printMessage
+
+LOG_LEVEL: int   = config.getint("logging", "level")
+LOG_DIR: Path    = Path(config.get("logging", "logdir"))
+LOG_SIZE: int    = config.getint("logging", "size")
+LOG_COUNT: int   = config.getint("logging", "count")
+LOG_FORMAT: str  = config.get("logging", "format")
+CON_FORMAT: str  = config.get("log_formats", "console")
+DATE_FORMAT: str = config.get("log_formats", "date")
+
+LOG_FORMATS = {
+    "std": config.get("log_formats", "std"),
+    "short": config.get("log_formats", "short"),
+    "long": config.get("log_formats", "long"),
+    "console": config.get("log_formats", "console"),
+}
 
 
 #-------------------------------------------------------------------
@@ -137,7 +147,125 @@ class Logger(logging.Logger):
 
 
 #-------------------------------------------------------------------
-# initRotatingFileHandler
+# OutLog Class
+#-------------------------------------------------------------------
+class Outlog(object):
+    """
+    A class to handle console message with concurrent logging
+    """
+
+    _logger = None
+
+    def __init__(self, logger):
+        """
+        Initialize the OutLog instance.
+
+        Args:
+        	logger: An optional logger instance for logging messages.
+        """
+        self._logger = logger
+
+    def logMessage(self, msg: str, level: int = config.get("logging", "level"), style: Optional[str] = None, **kwargs) -> None:
+        """
+        Log and print a message with an optional style.
+
+        Args:
+        	msg (str):      The message to log and print.
+        	level (int):    The level of the message to log and print.
+        	style (str):    The style to apply to the message. (Optional)
+        	**kwargs:       Arbitrary keyword arguments.
+        """
+        if self._logger.isEnabledFor(level):
+            self._logger.log(level, msg)
+        else:
+            return
+        symbol = None
+        match style:
+            case "debug":
+                symbol = config.get("symbols", "debug")
+            case "info":
+                symbol = config.get("symbols", "info")
+            case "warning":
+                symbol = config.get("symbols", "warning")
+            case "error":
+                symbol = config.get("symbols", "error")
+        if symbol is not None:
+            msg = f"{symbol} " + msg
+        printMessage(msg, style=style, **kwargs)
+
+    def logDebug(self, msg: str, **kwargs) -> None:
+        """
+        Log a DEBUG message.
+
+        Args:
+        	msg (str): The message to log.
+        	**kwargs: Arbitrary keyword arguments.
+        """
+        self.logMessage(msg, level=logging.DEBUG, style="debug", **kwargs)
+
+    def logInfo(self, msg: str, **kwargs) -> None:
+        """
+        Log an INFO message.
+
+        Args:
+        	msg (str): The message to log.
+        	**kwargs: Arbitrary keyword arguments.
+        """
+        self.logMessage(msg, level=logging.INFO, style="info", **kwargs)
+
+    def logWarning(self, msg: str, **kwargs) -> None:
+        """
+        Log a WARNING message.
+
+        Args:
+        	msg (str): The message to log.
+        	**kwargs: Arbitrary keyword arguments.
+        """
+        self.logMessage(msg, level=logging.WARNING, style="warning", **kwargs)
+
+    def logError(self, msg: str, **kwargs) -> None:
+        """
+        Log an ERROR message.
+
+        Args:
+        	msg (str): The message to log.
+        	**kwargs: Arbitrary keyword arguments.
+        """
+        self.logMessage(msg, level=logging.ERROR, style="error", **kwargs)
+
+    def logSuccess(self, msg: str, **kwargs) -> None:
+        """
+        Log a SUCCESS message.
+
+        Args:
+        	msg (str): The message to log.
+        	**kwargs: Arbitrary keyword arguments.
+        """
+        self.logMessage(msg, level=logging.INFO, style="success", **kwargs)
+
+    def logCritical(self, msg: str, **kwargs) -> None:
+        """
+        Log an ERROR message.
+
+        Args:
+        	msg (str): The message to log.
+        	**kwargs: Arbitrary keyword arguments.
+        """
+        self.logMessage(msg, level=logging.CRITICAL, style="error", **kwargs)
+
+    def logFatal(self, msg: str, **kwargs) -> None:
+        """
+        Log an ERROR message.
+
+        Args:
+        	msg (str): The message to log.
+        	**kwargs: Arbitrary keyword arguments.
+        """
+        self.logMessage(msg, level=logging.FATAL, style="error", **kwargs)
+
+
+#-------------------------------------------------------------------
+# MODULE FUNCTIONS
 #-------------------------------------------------------------------
 def initRotatingFileHandler(name: str, level: int = LOG_LEVEL, path: Path = LOG_DIR, maxSize: int = LOG_SIZE, backups: int = LOG_COUNT) -> RotatingFileHandler:
     """
@@ -158,10 +286,6 @@ def initRotatingFileHandler(name: str, level: int = LOG_LEVEL, path: Path = LOG_
     logFile = path / f"{name}.log"
     return RotatingFileHandler(logFile, maxBytes = maxSize, backupCount = backups, encoding='utf-8', delay=False)
 
-
-#-------------------------------------------------------------------
-# initStreamHandler
-#-------------------------------------------------------------------
 def initStreamHandler(stream: TextIO | Any = sys.stdout, level: int = LOG_LEVEL, style: str = CON_FORMAT) -> logging.StreamHandler:
     """
     Initialize and return a StreamHandler.
@@ -178,20 +302,24 @@ def initStreamHandler(stream: TextIO | Any = sys.stdout, level: int = LOG_LEVEL,
     handler.setLevel(level)
     return handler
 
+def getFileLogger(name: str, level: int = LOG_LEVEL, fmt: str = LOG_FORMAT) -> Logger:
+    """ Retrieve or create a logger instance """
+    formatter = getFormatter(fmt)
+    handler = initRotatingFileHandler(name, level=level, maxSize=LOG_SIZE, backups=LOG_COUNT)
+    handler.setFormatter(formatter)
+    log = Logger(name, level=level)
+    log.addHandler(handler)
+    return log
+
+def getFormatter(name: str = LOG_FORMAT) -> logging.Formatter:
+    msgFormat = LOG_FORMATS.get(name, LOG_FORMATS["std"])
+    return logging.Formatter(msgFormat, datefmt=DATE_FORMAT)
+
 
 #-------------------------------------------------------------------
-# MODULE FUNCTIONS
+# MODULE OBJECTS
 #-------------------------------------------------------------------
-def getFormatter(name: str = LOG_FORMAT) -> logging.Formatter:
-    match name:
-        case "std":
-            msgFormat = config.get("log_formats", "std")
-        case "short":
-            msgFormat = config.get("log_formats", "short")
-        case "long":
-            msgFormat = config.get("log_formats", "long")
-        case "console":
-            msgFormat = config.get("log_formats", "console")
-        case _:
-            msgFormat = config.get("log_formats", "std")
-    return logging.Formatter(msgFormat, datefmt=DATE_FORMAT)
+logger = getFileLogger(__pkg_name__, LOG_LEVEL, LOG_FORMAT)
+
+outlog = Outlog(logger)
+
