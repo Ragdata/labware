@@ -19,21 +19,20 @@ from logging.handlers import RotatingFileHandler
 from labware import __pkg_name__
 
 from . common import config
-from . console import printMessage
 
 LOG_LEVEL: int   = config.getint("logging", "level")
 LOG_DIR: Path    = Path(config.get("logging", "logdir"))
 LOG_SIZE: int    = config.getint("logging", "size")
 LOG_COUNT: int   = config.getint("logging", "count")
 LOG_FORMAT: str  = config.get("logging", "format")
-CON_FORMAT: str  = config.get("log_formats", "console")
-DATE_FORMAT: str = config.get("log_formats", "date")
+CON_FORMAT: str  = config.get("log_formats", "console", raw=True)
+DATE_FORMAT: str = config.get("log_formats", "date", raw=True)
 
 LOG_FORMATS = {
-    "std": config.get("log_formats", "std"),
-    "short": config.get("log_formats", "short"),
-    "long": config.get("log_formats", "long"),
-    "console": config.get("log_formats", "console"),
+    "std": config.get("log_formats", "std", raw=True),
+    "short": config.get("log_formats", "short", raw=True),
+    "long": config.get("log_formats", "long", raw=True),
+    "console": config.get("log_formats", "console", raw=True),
 }
 
 
@@ -322,4 +321,3 @@ def getFormatter(name: str = LOG_FORMAT) -> logging.Formatter:
 logger = getFileLogger(__pkg_name__, LOG_LEVEL, LOG_FORMAT)
 
 outlog = Outlog(logger)
-

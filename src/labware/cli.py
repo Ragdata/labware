@@ -10,17 +10,14 @@ Repository:		https://github.com/Ragdata/labware
 Copyright:		Copyright © 2026 Redeyed Technologies
 ====================================================================
 """
-import typer, rich, os
+import typer, os
 
-import labware.install as installer
+from typing import Annotated, Union
 
-from typing import Union
-from enum import Enum
-from typing_extensions import Annotated
+from . import install
 
 from . console import *
 
-from labware import config, log as logger, outlog, registry
 from labware import __pkg_name__, __version__
 
 
@@ -29,7 +26,7 @@ from labware import __pkg_name__, __version__
 #-------------------------------------------------------------------
 app = typer.Typer(name="labware", rich_markup_mode="rich", invoke_without_command=True)
 
-app.add_typer(installer.app, name="install", help="Installer", rich_help_panel="Labware Subcommands")
+app.add_typer(install.app, name="install", help="Installer", rich_help_panel="Labware Subcommands")
 
 
 @app.callback()
@@ -45,6 +42,12 @@ def env() -> None:
     printInfo("Current Environment Variables:")
     for key, value in os.environ.items():
         printMessage(f"{key}: {value}")
+
+@app.command()
+def install() -> None:
+    """ Install the package. """
+    printInfo("Starting installation process...")
+    install.app()
 
 @app.command()
 def uninstall():

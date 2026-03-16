@@ -12,13 +12,7 @@ Copyright:		Copyright © 2026 Redeyed Technologies
 """
 import typer, subprocess, shutil, sys, os
 
-from pathlib import Path
-from typing import Optional
-
-from . logger import *
 from . console import *
-
-from labware import log as logger, config
 
 app = typer.Typer(name="install", rich_markup_mode="rich", no_args_is_help=True)
 
