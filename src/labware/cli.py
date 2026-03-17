@@ -17,6 +17,8 @@ from typing import Annotated, Union
 from . import install
 
 from . console import *
+from . install import app as installApp
+from . import install as installer
 
 from labware import __pkg_name__, __version__
 
@@ -24,9 +26,9 @@ from labware import __pkg_name__, __version__
 #-------------------------------------------------------------------
 # Initialization
 #-------------------------------------------------------------------
-app = typer.Typer(name="labware", rich_markup_mode="rich", invoke_without_command=True)
+app = typer.Typer(rich_markup_mode="rich", invoke_without_command=True)
 
-app.add_typer(install.app, name="install", help="Installer", rich_help_panel="Labware Subcommands")
+app.add_typer(installApp, name="installer", help="Installer", rich_help_panel="Labware Subcommands")
 
 
 @app.callback()
@@ -47,7 +49,7 @@ def env() -> None:
 def install() -> None:
     """ Install the package. """
     printInfo("Starting installation process...")
-    install.app()
+    installer.cmd()
 
 @app.command()
 def uninstall():

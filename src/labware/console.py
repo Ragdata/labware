@@ -323,12 +323,6 @@ def rule(*args) -> None:
 	"""
     console.rule(*args)
 
-def status(arg: Union[str, Text], **kwargs) -> None:
-    """
-	Display a status and spinner
-	"""
-    console.status(arg, **kwargs)
-
 def errorExit(msg: str, code: int = 1, exc: Exception | None = None) -> None:
     """ Log an error message and exit the program """
     outlog.logError(msg)

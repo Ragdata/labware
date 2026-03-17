@@ -63,7 +63,7 @@ class Logger(logging.Logger):
             *args:          Variable length argument list
             **kwargs:       Arbitrary keyword arguments
         """
-        self.log(logging.CRITICAL, msg, args, **kwargs)
+        self.log(logging.CRITICAL, msg, *args, **kwargs)
 
     def debug(self, msg:str, *args, **kwargs) -> None:
         """
@@ -74,7 +74,7 @@ class Logger(logging.Logger):
             *args:          Variable length argument list
             **kwargs:       Arbitrary keyword arguments
         """
-        self.log(logging.DEBUG, msg, args, **kwargs)
+        self.log(logging.DEBUG, msg, *args, **kwargs)
 
     def error(self, msg:str, *args, **kwargs) -> None:
         """
@@ -85,7 +85,7 @@ class Logger(logging.Logger):
             *args:          Variable length argument list
             **kwargs:       Arbitrary keyword arguments
         """
-        self.log(logging.ERROR, msg, args, **kwargs)
+        self.log(logging.ERROR, msg, *args, **kwargs)
 
     def exception(self, msg:str, *args, **kwargs) -> None:
         """
@@ -96,7 +96,7 @@ class Logger(logging.Logger):
             *args:          Variable length argument list
             **kwargs:       Arbitrary keyword arguments
         """
-        self.log(logging.ERROR, msg, args, exc_info=True, **kwargs)
+        self.log(logging.ERROR, msg, *args, exc_info=True, **kwargs)
 
     def fatal(self, msg:str, *args, **kwargs) -> None:
         """
@@ -107,7 +107,7 @@ class Logger(logging.Logger):
             *args:          Variable length argument list
             **kwargs:       Arbitrary keyword arguments
         """
-        self.log(logging.FATAL, msg, args, **kwargs)
+        self.log(logging.FATAL, msg, *args, **kwargs)
 
     def info(self, msg:str, *args, **kwargs) -> None:
         """
@@ -118,7 +118,7 @@ class Logger(logging.Logger):
             *args:          Variable length argument list
             **kwargs:       Arbitrary keyword arguments
         """
-        self.log(logging.INFO, msg, args, **kwargs)
+        self.log(logging.INFO, msg, *args, **kwargs)
 
     def warning(self, msg:str, *args, **kwargs) -> None:
         """
@@ -129,7 +129,7 @@ class Logger(logging.Logger):
             *args:          Variable length argument list
             **kwargs:       Arbitrary keyword arguments
         """
-        self.log(logging.WARNING, msg, args, **kwargs)
+        self.log(logging.WARNING, msg, *args, **kwargs)
 
     def log(self, level: int, msg: str, *args, **kwargs) -> None:
         """

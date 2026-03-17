@@ -13,6 +13,7 @@ Copyright:		Copyright © 2026 Redeyed Technologies
 import typer, subprocess, shutil, sys, os
 
 from . console import *
+from . common import *
 
 app = typer.Typer(name="install", rich_markup_mode="rich", no_args_is_help=True)
 
@@ -27,8 +28,9 @@ REPO_PATH: Path = SCR_PATH.parent.parent
 #-------------------------------------------------------------------
 # MODULE FUNCTIONS
 #-------------------------------------------------------------------
-def appBanner(debug: Optional[bool] = False) -> None:
+def appBanner() -> None:
     logger.info("Labware Installer Started")
+    line()
     rule("[bold yellow]Labware Installer")
     line()
 
@@ -53,11 +55,15 @@ def checkUbuntu() -> None:
 
 def copyFiles(debug: Optional[bool] = False) -> bool:
     try:
+        printHead("Copying Files")
+        logger.info("Copying Files")
         for name, stub in config['dirs'].items():
             repodir = REPO_PATH / stub
             userdir = Path.home() / '.labware' / stub
             if not userdir.exists():
                 userdir.mkdir(parents=True, exist_ok=True)
+                if debug:
+                    outlog.logDebug(f"Created Directory '{userdir}'")
             if repodir.exists():
                 for filename in os.scandir(repodir):
                     filepath = filename.path
@@ -73,6 +79,7 @@ def copyFiles(debug: Optional[bool] = False) -> bool:
     except Exception as e:
         outlog.logError(f"File Copy Error: {e}")
         return False
+    printSuccess("DONE!")
     return True
 
 def run(command: str, check=True, capture=False, input_txt=None):
@@ -124,10 +131,17 @@ def userExists():
 #-------------------------------------------------------------------
 def cmd(debug: Optional[bool] = False) -> None:
     """ Installer Entrypoint """
-    appBanner(debug)
+    run("clear")
+    appBanner()
     checkRoot()
     checkUbuntu()
     checkPython()
+    line()
+    copyFiles(debug)
+    line()
+
+
+
 
     # if not checkUser():
     #     errorExit("This package MUST be run as root or with sudo privileges", 1)
