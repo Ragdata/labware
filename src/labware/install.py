@@ -82,6 +82,14 @@ def copyFiles(debug: Optional[bool] = False) -> bool:
     printSuccess("DONE!")
     return True
 
+def installDotfiles() -> bool:
+    try:
+        printHead("Installing Dotfiles")
+    except Exception as e:
+        errorExit(f"Error installing Dotfiles: {e}")
+        return False
+    return True
+
 def run(command: str, check=True, capture=False, input_txt=None):
     """ Execute shell command with error handling """
     try:
